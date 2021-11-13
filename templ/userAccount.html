@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <head>
+        <meta charset="utf-8">
+        <title>Dmytro Reznichenko</title>
+        <link rel="stylesheet" type="text/css" href="/css/style.css">
+        <script src="/script/jquery-3.2.1.min.js" ></script>
+        <script src="/script/js_scripts.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+        <script type="text/javascript">
+            let modal
+            function ShowModal(id){
+                modal = $("#"+id+"modal");
+                modal.attr("style","display:block");
+            }
+            function CloseModal(){
+                modal.attr("style","display:none");
+            }
+            window.onclick = function(event) {
+                if (event.target == modal) {
+                    modal.attr("style","display:none");
+                }
+            }
+            function removeFromChart(item) {
+                let dataId = item.toString()
+                $.ajax({
+                    url: "/data/delFromOrder",
+                    method: "POST",
+                    data: JSON.stringify(dataId),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function () {
+                        alert("del")
+                        $("#"+dataId).empty()
+                    },
+                    error: function () {
+                        alert("err err chart del")
+                    },
+                })
+            }
+            function showAnnoncements(data) {
+               // $('.anns').empty()
+                $(".middlescroll").empty()
+                $.each(data, function(k)  {
+                    id = data[k].idstr
+                    $(".middlescroll").append("<article class='searchitem' style='height: 170px;'>" +
+                        "<div class='searchitemimage' style='background-image:url("+"/photo/"+id+"_image"+".jpg"+")'>"+
+                        "</div>" +
+                        "<div class='searchitemtext' ><h2>"+data[k].title+"</h2>" +
+                        "<ul class='touristinfo'>" +
+                        "<li><p>Activity: "+data[k].activity.name+"</p></li>" +
+                        "<li><p>Phone number: "+data[k].phone_number+"</p></li>" +
+                        "<li><p>Email: "+data[k].email+"</p></li>" +
+                        "<li><p>Set start date: "+data[k].start_dates+"</p>" +
+                        "<input id='"+data[k].idstr+"_day"+"'type='text'>" +
+                        "<button " +
+                        "id ='"+data[k].idstr+"' " +
+                        "data-id='"+data[k].activity.id+"' " +
+                        "style='background-color:beige;' " +
+                        "onclick=addToChart('"+data[k].idstr+"') >" +
+                        "Add</button>" +
+                        "<button class='showmodal' onclick=ShowModal('"+data[k].idstr+"')>More Info</button>"+
+                        "<!-- The Modal -->" +
+                        "<div id='"+data[k].idstr+"modal' class='modal'>" +
+                        "  <!-- Modal content -->" +
+                        " <div class='modal-content'>" +
+                        " <span class='close' onclick=CloseModal()>&times;</span>" +
+                        "<ul class='touristinfo'>" +
+                        "<li><p>Activity Name: "+data[k].activity.name+"</p></li>" +
+                        "<li><p>Type: "+data[k].activity.type+"</p>" +
+                        "<li><p>Price: "+data[k].activity.price+"</p>" +
+                        "<li><p>Description: "+data[k].activity.description+"</p>" +
+                        "</li>" +
+                        "</ul>" +
+                        "</div>" +
+                        "</div>"+
+                        "</li>" +
+                        "</ul>" +
+                        "</article>")
+                });
+                console.log(data);
+            }
+            $(document).ready(function (){
+                $.get( "/data/userlogin", function(info) {
+                    $("#user_name").last().html(info.toString());
+                })
+                $.get( "/data/announcements",function(data){showAnnoncements(data)});
+
+                $.get( "/data/activities", function(data){showActivities(data)});
+            })
+            function showActivities(data) {
+                $.each(data, function(k)  {
+                    id = data[k].id_sting
+                    $("#chartitemslist").append("<div id='"+id+"'>" +
+                        "<ul class='chartitem' >" +
+                        "<span class='delbutton' onclick=removeFromChart('"+id+"')>&times;</span>"+
+                        "<li><div class ='chartitemimage'></div></li>" +
+                        "<li><p>Name:"+data[k].name+"</p></li>" +
+                        "<li><p>Type:"+data[k].type+"</p></li>" +
+                        "<li><p>Date:"+data[k].start_date+"</p></li>" +
+                        "</ul>" +
+                        "</div>");
+                });
+                console.log(data);
+            }
+            function addToChart(item){
+                alert(item)
+                let id = item.toString();
+                let day = $("#"+id+"_day").val();
+                var data = {
+                    "idstr": id ,
+                    "day":   day,
+                }
+                $.ajax({
+                    url: "/data/addToOrder",
+                    method: "POST",
+                    data : JSON.stringify(data),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function(data){showActivities(data)},
+                    error:function() {
+                        alert("err err chart add")
+                    },
+                })
+            }
+            function Find(type){
+                $("#default").empty()
+                let input = {text: $("#findinput").val().toString()}
+                if (type != "") {
+                    input.text = type
+                }
+                if (input.text == ""){
+                    $.get( "/data/announcements",function (data){showAnnoncements(data)});
+                    return
+                }
+                $.ajax({
+                    url: "/data/findAnnouncements",
+                    method: "POST",
+                    data : JSON.stringify(input),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success:function (data){showAnnoncements(data)},
+                    error:function() {
+                        alert("Error Search!")
+                    },
+                })
+            }
+        </script>
+    </head>
+    <body>
+        <div class="leftcolumn"> <!-- all activity type lists -->
+            <div class="userblock">
+                <div class="username" style="margin-top: 10px">
+                    <p id="user_name" style="margin: 0;"></p>
+                    <form action="/user/logout">
+                        <button onclick="logOut()">Log Out</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="midcolumnn"> <!-- main menu activities list -->
+            <div class="topnav">
+                <a class="active" onclick="Find('all')">Main</a>
+                <a onclick="Find('Hotel');$('.active').removeClass('active');$(this).addClass('active');">Hotels</a>
+                <a onclick="Find('Restourants');$('.active').removeClass('active');$(this).addClass('active');">Restourants</a>
+                <a onclick="Find('Bar');$('.active').removeClass('active');$(this).addClass('active');">Bars</a>
+                <a onclick="window.location.reload();$('.active').removeClass('active');$(this).addClass('active');">About Us</a>
+            </div>
+            <div class="searchbounds">
+                <button class="mainsearchbutton" onclick = "Find()">Find</button>
+                <input id="findinput" type="text" class="mainsearchfield">
+            </div>
+            <div class="middlescroll">
+
+            </div>
+        </div>
+        <div class="rightcolumn"> <!-- user selected items -->
+            <button class="chartbutton" onclick="ShowModal('author')">Become an author</button>
+            <!-- The Modal -->
+            <div id="authormodal" class="modal">"
+                <!-- Modal content -->
+                <div class="modal-content">
+                    <span class="close" onclick=CloseModal()>&times;</span>
+                    <p>To become an author go to telegram bot and validate your username.</p>
+                    <p>Than sign in one more time. Tap <a style="color: #4863da" href="https://t.me/KyivTripsValidationBot">hear</a> to open bot.</p>
+                </div>
+            </div>
+            <div class="userchart">
+                <div class="chartname">
+                    <p>User's chart</p>
+                </div>
+                <div class="chartitems" id="chartitemslist">
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

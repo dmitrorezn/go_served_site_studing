@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Dmytro Reznichenko</title>
+    <link rel="stylesheet" type="text/css" href="./css/style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="./script/js_scripts.js"></script>
+    <script type="text/javascript">
+        function DeleteAnnouncement(id){
+            let del = confirm("Do you want to delete this Announcement?");
+            if (del) {
+                let dataId = id.toString()
+                $.ajax({
+                    url: "/admindata/delAnnouncement",
+                    method: "POST",
+                    data: JSON.stringify(dataId),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function () {
+                        alert("Announcement deleted!")
+                        $("#"+dataId).empty()
+                    },
+                    error: function () {
+                        alert("err Announcement del")
+                    },
+                })
+
+            }else{
+                alert("Delete canceled!")
+            }
+
+        }
+        let modal
+        function ShowModal(id){
+            modal = $("#"+id+"modal");
+            modal.attr("style","display:block");
+        }
+        function CloseModal(){
+            modal.attr("style","display:none");
+        }
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.attr("style","display:none");
+            }
+        }
+        $(document).ready(function (){
+
+            $.get( "/admindata/userlogin", function(data) {
+                $("#user_name").last().html("Author: "+data.toString());
+
+            })
+            $.get( "/admindata/announcements", function (data){ShowAdminAnnouncements(data)});
+        })
+        function ShowAdminAnnouncements(data) {
+            $(".middlescroll").empty()
+            $.each(data, function(k)  {
+                id = data[k].idstr
+                let title = data[k].title.toString()
+                let titletext = title.split(" ")
+                title = ""
+                titletext.forEach(function (v,k){
+                    title = title + "_" + v
+                })
+                let desc = data[k].activity.description.toString()
+                let desctext = desc.split(" ")
+                desc = ""
+                desctext.forEach(function (v){
+                    desc = desc + "_" + v
+                })
+                let dates = data[k].start_dates.toString()
+                let datesmass = dates.split(" ")
+                dates = ""
+                datesmass.forEach(function (v){
+                    dates = dates + "_" + v
+                })
+                $(".middlescroll").append("<article id = '"+id+"' class='searchitem' style='height: 150px;'>" +
+                    "<div class='searchitemimage' style=';background-image:url("+"/photo/"+data[k].image_path+".jpg"+")'>"+
+                    "</div>" +
+                    "<div class='searchitemtext'>" +
+                    "<div class='delbutton' onclick=DeleteAnnouncement('"+id+"')>&times;</div>"+
+                    "<ul class='touristinfo'>" +
+                    "<li><p>Title:"+data[k].title+"</p></li>" +
+                    "<li><p>Activity Name: "+data[k].activity.name+"</p></li>" +
+                    "<li><p>Phone number: "+data[k].phone_number+"</p></li>" +
+                    "<li><p>Email: "+data[k].email+"</p></li>" +
+                    "<li><p>Start dates: "+data[k].start_dates+"</p>"+
+                    "<button class='showmodal' onclick=ShowModal('"+data[k].idstr+"')>All Info</button>"+
+                    "<!-- The Modal -->" +
+                    "<div id='"+data[k].idstr+"modal' class='modal'>" +
+                    "<!-- Modal content -->" +
+                    " <div class='modal-content'>" +
+                    " <span class='close' onclick=CloseModal()>&times;</span>" +
+                    "<ul class='touristinfo'>" +
+                    "<li><p>Title:"+data[k].title+"</p></li>" +
+                    "<li><p>Activity Name: "+data[k].activity.name+"</p></li>" +
+                    "<li><p>Phone number: "+data[k].phone_number+"</p></li>" +
+                    "<li><p>Email: "+data[k].email+"</p></li>" +
+                    "<li><p>Start dates: "+data[k].start_dates+"</p>"+
+                    "<li><p>Type: "+data[k].activity.type+"</p>" +
+                    "<li><p>Price: "+data[k].activity.price+"</p>" +
+                    "<li><p>Description: "+data[k].activity.description+"</p>" +
+                    "</li>" +
+                    "</ul>" +
+                    "</div>" +
+                    "</div>"+
+                    "</li>" +
+                    "</ul>" +
+                    "<button id='remakebtn' aria-selected='false' value='Remake' " +
+                    "onclick = ShowUpdateLines('"+id+"','" +
+                    title  + "','"+
+                    data[k].activity.name +"','" +
+                    data[k].phone_number + "','" +
+                    data[k].email + "','" +
+                    data[k].activity.type + "','" +
+                    data[k].activity.price + "','" +
+                    desc + "','"+
+                    dates+"')>Remake</button>" +
+                    "</article>")
+            });
+            console.log(data);
+        }
+        function Find(){
+            $("#default").empty()
+            let input = $("#findinput").val().toString()
+            if (input == ""){
+                $.get( "/admindata/announcements",function (data){ShowAdminAnnouncements(data)});
+                return
+            }
+            $.ajax({
+                url: "/admindata/findAnnouncements",
+                method: "POST",
+                data : JSON.stringify(input),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success:function (data){ShowAdminAnnouncements(data)},
+                error:function() {
+                    alert("Error Search!")
+                },
+            })
+        }
+        function sendImage(e){
+            let fd = new FormData();
+            let file = e.targetElement.files[0];
+            alert(file)
+            fd.append('file',file);
+            $.ajax({
+                url: '/admin/addImage',
+                type: 'POST',
+                data: fd,
+                contentType: false,
+                processData: false,
+                success : function() {
+                    alert("success image send")
+                },
+                error: function (){
+                    alert("error Image send try again")
+                }
+            });
+            console.log(data)
+        }
+        function ShowInputLines(){
+            if ($("#insertAnn").attr("aria-selected") == "false"){
+                $("#insertAnn").attr("aria-selected", "true");
+                $('#lines').append("<h2>Create New Announcement</h2><br>" +
+                    "<div style='padding-left: 30px'><h>Title</h><br><input type='text' id='title'><br>" +
+                    "<h>Name</h><br><input type='text' id='name'><br>" +
+                    "<h>Type</h><br><input type='text' id='type'><br>" +
+                    "<h>Price</h><br><input type='text' id='price'><br>" +
+                    "<h>Description</h><br><input type='text' id='description'><br>" +
+                    "<h>Email</h><br><input type='text' id='email'><br>" +
+                    "<h>Phone number</h><br><input type='text' id='phone_number'><br>" +
+                    "<h>Start dates</h><br><input type='text' id='start_dates'><br>" +
+                    "<button onclick='sendData()'>Save</button>" +
+                    "<form method='POST' action='/author/addImage' enctype='multipart/form-data'>" +
+                    "    <label for='file'>Choose File To Upload</label>" +
+                    "    <input type='file' id='file' name='file'>" +
+                    "    <br>" +
+                    "    <input type='submit'>" +
+                    "</form>");
+            }
+            else{
+                $("#insertAnn").attr("aria-selected","false");
+                $("#lines").empty()
+            }
+        }
+        function UnshowUpdateLines(){
+            $('#lines').empty()
+        }
+        function ShowUpdateLines(idstr,t,n,ph,e,ty,p,d,s){
+            alert(t+n+ph+e+ty+p+d+s)
+            $('#lines').empty()
+            $('#lines').append("<h2>Update Announcement</h2><br>" +
+                "<div style='padding-left: 30px'>" +
+                "<h class='updh'>Title</h><br><input type='text' id='title' value='" + t + "'><br>" +
+                "<h class='updh'>Name</h><br><input type='text' id='name' value='" + n + "'><br>" +
+                "<h class='updh'>Type</h><br><input type='text' id='type' value='" + ty + "'><br>" +
+                "<h class='updh'>Price</h><br><input type='text' id='price' value='" + p + "'><br>" +
+                "<h class='updh'>Description</h><br><input type='text' id='description' value='" + d + "'><br>" +
+                "<h class='updh'>Email</h><br><input type='text' id='email' value='" + e + "'><br>" +
+                "<h class='updh'>Phone number</h><br><input type='text' id='phone_number' value='" + ph + "'><br>" +
+                "<h class='updh'>Start Dates</h><br><input type='text' id='start_dates' value='" + s + "'><br>"+
+                "<button onclick = sendUpdateData('"+idstr.toString()+"')>Save</button>" +
+                "<button onclick = UnshowUpdateLines() >Cancel</button>");
+        }
+        function sendUpdateData(idstr) {
+            let err = 1
+            if ($('#name').val().toString() == "undefined" || Boolean($('#name').val().toString())==false){
+                $('#name').attr("style","background-color:red")
+                err = 0
+            } else {$('#name').attr("style","background-color:white")}
+            if ($('#title').val().toString() == "undefined" || Boolean($('#title').val().toString())==false){
+                $('#title').attr("style","background-color:red")
+                err = 0
+            } else {$('#title').attr("style","background-color:white")}
+            if ($('#type').val().toString() == "undefined" || Boolean($('#type').val().toString())==false){
+                $('#type').attr("style","background-color:red")
+                err = 0
+            } else {$('#type').attr("style","background-color:white")}
+            if ($('#email').val().toString() == "undefined" || Boolean($('#type').val().toString())==false){
+                $('#email').attr("style","background-color:red")
+                err = 0
+            } else {$('#email').attr("style","background-color:white")}
+            if ($('#price').val().toString() == "undefined" || Boolean(parseFloat($('#price').val().toString()))==false || Boolean($('#price').val().toString())==false){
+                $('#price').attr("style","background-color:red")
+                err = 0
+            } else {$('#price').attr("style","background-color:white")}
+            if ($('#description').val().toString() == "undefined" || Boolean($('#description').val().toString())==false){
+                $('#description').attr("style","background-color:red")
+                err = 0
+            } else {$('#description').attr("style","background-color:white")}
+            if ($('#phone_number').val().toString() == "undefined" || Boolean($('#phone_number').val().toString())==false){
+                $('#phone_number').attr("style","background-color:red")
+                err = 0
+            } else {$('#phone_number').attr("style","background-color:white")}
+            if ($('#start_dates').val().toString() == "undefined" || Boolean($('#start_dates').val().toString())==false) {
+                $('#start_dates').attr("style", "background-color:red")
+                err = 0
+            } else {$('#start_dates').attr("style","background-color:white")}
+            if (err == 0){
+                alert("err")
+                return
+            }
+            let data = {
+                "idstr":idstr,
+                "name": $('#name').val(),
+                "title":$('#title').val(),
+                "type":$('#type').val(),
+                "price":$('#price').val(),
+                "description":$('#description').val(),
+                "email":$('#email').val(),
+                "phone_number":$('#phone_number').val(),
+                "start_dates":$('#start_dates').val(),
+            }
+            $.ajax({
+                url: '/admin/updateannouncement',
+                type: 'POST',
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success : function() {
+                    alert("updated")
+                    $('#lines').empty()
+                },
+            });
+            console.log(data)
+        }
+    </script>
+</head>
+<body>
+<div class="authleftcolumn"> <!-- all activity type lists -->
+    <div class="userblock">
+        <div class="username" style="margin-top: 10px">
+            <p id="user_name" style="margin: 0;"></p>
+            <form action="/admin/logout">
+                <button onclick="logOut()">Log Out</button>
+            </form>
+            <button style="padding-top: 10px" id="insertAnn" aria-selected="false" onclick=ShowInputLines()>Add New Announcement</button>
+        </div>
+
+        <div id="lines">
+
+        </div>
+    </div>
+</div>
+<div class="midcolumnn"> <!-- main menu activities list -->
+    <div class="searchbounds">
+        <button  class="mainsearchbutton" onclick="Find()">Find</button>
+        <input id="findinput" type="text" class="mainsearchfield">
+    </div>
+    <div class="middlescroll">
+
+    </div>
+</div>
+</body>
+</html>

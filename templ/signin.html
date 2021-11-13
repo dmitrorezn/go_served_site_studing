@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset = "utf-8">
+    <script src="/templates/jquery-3.2.1.min"></script>
+    <script src="/templates/myjs.js"></script>
+    <link rel="stylesheet" type="text/css" href="./css/style.css">
+    <title>
+        Insert Worker Form
+    </title>
+</head>
+<body>
+<form action="http://localhost:8080/auth/signin" method="POST">
+    <h>Login</h><br>
+    <input id="login" type="text" name="login" maxlength="24"><br>
+    <h>Password</h><br>
+    <input id="password" type="password" name="password" maxlength="24"><br>
+    <input type="submit" name="submit" value="Sign In" >
+    <input type="button" name="register" onclick="location.href='http://localhost:8080/auth/regform';" value="Register"/>
+</form>
+<h>{{.error}}<h>
+</body>
+</html>

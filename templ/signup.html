@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>
+        Insert Worker Form
+    </title>
+    <meta charset = "utf-8">
+    <link rel="stylesheet" type="text/css" href="./css/style.css">
+</head>
+<body>
+<form action="http://localhost:8080/auth/signup" method="POST">
+    <h>Login</h><br>
+    <input type="text" name="login" maxlength="24"><br>
+    <h>Email</h><br>
+    <input type="text" name="email" maxlength="32"><br>
+    <h>Password</h><br>
+    <input type="password" name="password" maxlength="24"><br>
+    <input type="submit" name="submit" value="Register">
+    <input type="button" name="sign_up" onclick="location.href='http://localhost:8080/auth/signform';" value="Sign In"/>
+</form>
+</body>
+</html>
