@@ -86,6 +86,12 @@ a:hover{
     text-align: center;
 }
 
+.footer{
+    text-align: center;
+    padding: 20px 60px 20px 10px;
+    font-family: "Juice ITC", cursive;
+}
+
 .midcolumnn{
     width: 80%;
     height: 100%;
@@ -402,7 +408,7 @@ body {
 
 .topnav {
     overflow: hidden;
-    background-color: #333;
+    background-color: antiquewhite;
 }
 
 .topnav a {
@@ -413,7 +419,7 @@ body {
     padding: 14px;
     text-decoration: none;
     font-size: 17px;
-    width: 18%;
+    width: calc(100%/5);
 }
 
 .topnav a:hover {

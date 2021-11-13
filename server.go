@@ -693,6 +693,7 @@ func AddToOrder(c *gin.Context) {
 	return
 }
 func Logout(c *gin.Context) {
+	fmt.Println("Logout")
 	login ,err := c.Cookie("login")
 	if err != nil{
 		fmt.Println(err.Error())
@@ -705,9 +706,9 @@ func Logout(c *gin.Context) {
 		return
 	}
 	// Clear the cookie
-	c.SetCookie("token", "", -1, "", "", false, true)
-	c.SetCookie("login", "", -1, "", "", false, true)
-	c.Set("isLoggedIn", false)
+	c.SetCookie("token", "", -1, "/", "", false, true)
+	c.SetCookie("login", "", -1, "/", "", false, true)
+	c.SetCookie("isLoggedIn", "false",10000,"","",false,true)
 	// Redirect to the home page
 	c.Redirect(http.StatusFound, "/auth/signform")
 }

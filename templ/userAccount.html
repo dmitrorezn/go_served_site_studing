@@ -166,7 +166,7 @@
                 <a onclick="Find('Hotel');$('.active').removeClass('active');$(this).addClass('active');">Hotels</a>
                 <a onclick="Find('Restourants');$('.active').removeClass('active');$(this).addClass('active');">Restourants</a>
                 <a onclick="Find('Bar');$('.active').removeClass('active');$(this).addClass('active');">Bars</a>
-                <a onclick="window.location.reload();$('.active').removeClass('active');$(this).addClass('active');">About Us</a>
+                <a onclick="window.location='https://github.com/dmitrorezn'">About Us</a>
             </div>
             <div class="searchbounds">
                 <button class="mainsearchbutton" onclick = "Find()">Find</button>
@@ -175,6 +175,7 @@
             <div class="middlescroll">
 
             </div>
+            {{template "footer"}}
         </div>
         <div class="rightcolumn"> <!-- user selected items -->
             <button class="chartbutton" onclick="ShowModal('author')">Become an author</button>
@@ -196,4 +197,5 @@
             </div>
         </div>
     </body>
+
 </html>
